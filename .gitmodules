@@ -1,0 +1,3 @@
+[submodule ".themes/FoxSlide"]
+	path = .themes/FoxSlide
+	url = git@github.com:sevenadrian/foxslide.git
