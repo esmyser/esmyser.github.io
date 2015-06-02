@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: School | All the Wiser]]></title>
+  <link href="http://esmyser.github.io/blog/categories/school/atom.xml" rel="self"/>
+  <link href="http://esmyser.github.io/"/>
+  <updated>2015-06-02T14:44:54-04:00</updated>
+  <id>http://esmyser.github.io/</id>
+  <author>
+    <name><![CDATA[Ezra Smyser]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[First Post]]></title>
+    <link href="http://esmyser.github.io/blog/2015/06/02/first-post/"/>
+    <updated>2015-06-02T14:41:09-04:00</updated>
+    <id>http://esmyser.github.io/blog/2015/06/02/first-post</id>
+    <content type="html"><![CDATA[<p>&ldquo;First post&hellip;.!&rdquo;</p>
+]]></content>
+  </entry>
+  
+</feed>
