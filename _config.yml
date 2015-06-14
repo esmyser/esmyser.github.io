@@ -3,11 +3,11 @@
 # ----------------------- #
 
 url: http://esmyser.github.io
-title: A Wiser Smyser
-subtitle: 
+title: Smyser Grows Wiser
+subtitle: Learning to Code at the Flatiron School
 author: Ezra Smyser
 simple_search: https://www.google.com/search
-description: Learning to Code at the Flatiron School
+description:
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -64,13 +64,13 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user:
+github_user: esmyser
 github_repo_count: 0
 github_show_profile_link: true
 github_skip_forks: true
 
 # Twitter
-twitter_user:
+twitter_user: esmyser
 twitter_tweet_button: true
 
 # Google +1
@@ -95,7 +95,7 @@ disqus_short_name:
 disqus_show_comment_count: false
 
 # Google Analytics
-google_analytics_tracking_id:
+google_analytics_tracking_id: UA-40722055-2
 
 # Facebook Like
 facebook_like: false
