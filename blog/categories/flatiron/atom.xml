@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Flatiron | All the Wiser]]></title>
+  <title><![CDATA[Category: flatiron | Smyser Grows Wiser]]></title>
   <link href="http://esmyser.github.io/blog/categories/flatiron/atom.xml" rel="self"/>
   <link href="http://esmyser.github.io/"/>
-  <updated>2015-06-02T14:44:54-04:00</updated>
+  <updated>2015-06-14T16:48:02-04:00</updated>
   <id>http://esmyser.github.io/</id>
   <author>
     <name><![CDATA[Ezra Smyser]]></name>
@@ -18,7 +18,7 @@
     <link href="http://esmyser.github.io/blog/2015/06/02/first-post/"/>
     <updated>2015-06-02T14:41:09-04:00</updated>
     <id>http://esmyser.github.io/blog/2015/06/02/first-post</id>
-    <content type="html"><![CDATA[<p>&ldquo;First post&hellip;.!&rdquo;</p>
+    <content type="html"><![CDATA[<p>&ldquo;Hello world!&rdquo;</p>
 ]]></content>
   </entry>
   
