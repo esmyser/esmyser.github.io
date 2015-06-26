@@ -9,7 +9,7 @@
   <meta name="author" content="Ezra Smyser">
 
   
-  <meta name="description" content="All Posts Expressive Code Two weeks ago I started learning Ruby at the Flatiron School. In that time we’ve gone over the basics of the language. One &hellip;">
+  <meta name="description" content="All Posts Won't Somebody Please Think of the Children?! save the parents first This week we’ve been playing with Active Record. It’s pretty powerful &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +64,204 @@
 
   <div class="article-list">
     <div class="container">
+      
+      
+      <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+          <article>
+  <h2><a href="/blog/2015/06/25/wont-somebody-please-think-of-the-children/">Won't Somebody Please Think of the Children?!</a></h2>
+  
+  <p>
+    <h4>save the parents first</h4>
+
+
+
+
+<p>This week we’ve been playing with Active Record. It’s pretty powerful. So far, it’s allowed us to perform basic database procedures through Ruby. You can set up your whole database without writing a single line of SQL. It’s got a bunch of slick conventions that could merit their own blog posts (classes' file names get converted to methods, ActiveRecord_Associations_CollectionProxy masquerade as arrays; activeRecord’s a weird place). But what I’ve enjoyed most about Active Record is that it puts your classes on steroids.</p>
+
+
+
+
+<p>You can instantiate instances of other classes from within a class, and establish their connection to each other all in one line of code. The class can reach across to other classes and mess around with them.</p>
+
+
+
+
+<p>Imagine we’re writing a database for a library. We have books and authors. Each author has_many :books, and each book belongs_to an :author.</p>
+
+
+
+
+<pre><code>
+class Book < ActiveRecord::Base
+  belongs_to :author
+end
+</code></pre>
+
+
+
+
+<pre><code>
+class Author < ActiveRecord::Base
+  has_many :books
+end
+</code></pre>
+
+
+
+
+<p>Using belongs_to and has_many, we’ve given the classes a whole new host of methods. Book instances, belonging to Authors, can now:</p>
+
+
+
+
+<ul>
+  <li>author </li> 
+  <li>author= </li>
+  <li>build_author </li>
+  <li>create_author </li>
+  <li>create_author! </li>
+</ul>
+
+
+
+
+<p>Author instances, having many books, can now:</p>
+
+
+
+
+<ul>
+  <li>books(force_reload = false)</li>
+  <li>books<<(object, ...)</li>
+  <li>books.delete(object, ...)</li>
+  <li>books.destroy(object, ...)</li>
+  <li>books=(objects)</li>
+  <li>books_singular_ids</li>
+  <li>books_singular_ids=(ids)</li>
+  <li>books.clear</li>
+  <li>books.empty?</li>
+  <li>books.size</li>
+  <li>books.find(...)</li>
+  <li>books.where(...)</li>
+  <li>books.exists?(...)</li>
+  <li>books.build(attributes = {}, ...)</li>
+  <li>books.create(attributes = {})</li>
+  <li>books.create!(attributes = {})</li>
+</ul>
+
+
+
+
+<p>That’s a lot of new functionality from Active Record (though actually, having touched briefly on Rails today, relatively, it’s not that much). If you’re curious what they all do, check out <a href = http://edgeguides.rubyonrails.org/association_basics.html>this page</a>.</p>
+
+
+
+
+<p>So let’s say we want to create a new author and a book, and make sure that they’re properly related to each other. We can write:</p>
+
+
+
+
+<pre><code>
+pkd = Author.new(name: ‘Phillip K. Dick’)
+android = pkd.books.build(title: ‘Do Androids Dream of Electric Sheep’)
+pkd.save
+=> true
+
+android.persisted?
+=> true
+</code></pre>
+
+
+
+
+<p>In three lines we have created an author memory using .new, created a book in memory using .build, and added them to the database using .save. Behind the scenes, we assigned the book to belong to the author via an author_id, made the author own the book via a book_id, and saved the book to the database. That’s a ton of work being done by Active Record. I want to investigate the parent-children, one-to-many, has_many / belongs_to relationship.</p>
+
+
+
+
+<p>When we saved the Author pkd, we also saved the book we created. This is pretty handy. We only have to save one object, and automatically it and all of its children are saved to the database. If we had added more books to pkd, we would have saved them as well.</p>
+
+
+
+
+<p>But what if we save the book, and not the author?</p>
+
+
+
+
+<pre><code>
+pkd = Author.new(name: “Phillip K Dick”)
+android = pkd.books.build(title: ‘Do Androids Dream of Electric Sheep’)
+stigmata = pd.books.build(title: ‘The Three Stigmata of Palmer Eldritch’)
+android.save
+
+pkd.persisted?
+=> true
+
+stigmata.persisted?
+=> true
+</code></pre>
+
+
+
+
+<p>Once again, all three of the objects we created are saved in memory and in the databse. Beautiful.</p>
+
+
+
+
+<p>So we can always save one object in a parent-child relationship and all of the children and the parent will be saved right? Unfortunately, no - not right. Let’s look at the inverse of the above: when the book creates the author — when the child creates the parent.</p>
+
+
+
+
+<pre><code>
+android = Book.new(title: ‘Do Androids Dream of Electric Sheep’)
+pkd = android.build_author(name: “Phillip K Dick”)
+android.save
+
+pkd.persisted?
+=> false
+</code></pre>
+
+
+
+
+<p>Here we created a book in line 1, used the book to create an author and establish their relationship in line 2, and saved the book in line 3. Yet if we looked at the objects, only the book would be saved in the database, while the author would remain in memory. It’s an odd edge case, but one to look out for.</p>
+
+
+
+
+<p>So when you’re saving your parents and children to the database, think of the database like an airplane. If there’s ever an emergency, you should put oxygen on yourself first before saving your children. ActiveRecord is the same: save the parents first, so they can save the children. Won’t you please think of the children?</p>
+
+
+  </p>
+  <span class="meta">
+    written 
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-06-25T20:35:25-04:00" pubdate data-updated="true"></time>
+    
+
+
+  </span>
+
+  
+</article>
+
+        </div>
+      </div>
       
       
       <div class="row">

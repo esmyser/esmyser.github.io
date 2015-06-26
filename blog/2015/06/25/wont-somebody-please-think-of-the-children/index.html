@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Won't Somebody Please Think of the Children?! - Smyser Grows Wiser</title>
+  <meta name="author" content="Ezra Smyser">
+
+  
+  <meta name="description" content="save the parents first This week we’ve been playing with Active Record. It’s pretty powerful. So far, it’s allowed us to perform basic database &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://esmyser.github.io/blog/2015/06/25/wont-somebody-please-think-of-the-children/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Smyser Grows Wiser" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40722055-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Smyser Grows Wiser</a></h1>
+</hgroup>
+
+</header>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Won't Somebody Please Think of the Children?!</h1>
+    
+  </header>
+
+
+
+
+
+<div class="entry-content"><h4>save the parents first</h4>
+
+
+<p>This week we’ve been playing with Active Record. It’s pretty powerful. So far, it’s allowed us to perform basic database procedures through Ruby. You can set up your whole database without writing a single line of SQL. It’s got a bunch of slick conventions that could merit their own blog posts (classes' file names get converted to methods, ActiveRecord_Associations_CollectionProxy masquerade as arrays; activeRecord’s a weird place). But what I’ve enjoyed most about Active Record is that it puts your classes on steroids.</p>
+
+<p>You can instantiate instances of other classes from within a class, and establish their connection to each other all in one line of code. The class can reach across to other classes and mess around with them.</p>
+
+<p>Imagine we’re writing a database for a library. We have books and authors. Each author has_many :books, and each book belongs_to an :author.</p>
+
+<pre><code>
+class Book < ActiveRecord::Base
+  belongs_to :author
+end
+</code></pre>
+
+
+<pre><code>
+class Author < ActiveRecord::Base
+  has_many :books
+end
+</code></pre>
+
+
+<p>Using belongs_to and has_many, we’ve given the classes a whole new host of methods. Book instances, belonging to Authors, can now:</p>
+
+<ul>
+  <li>author </li> 
+  <li>author= </li>
+  <li>build_author </li>
+  <li>create_author </li>
+  <li>create_author! </li>
+</ul>
+
+
+<p>Author instances, having many books, can now:</p>
+
+<ul>
+  <li>books(force_reload = false)</li>
+  <li>books<<(object, ...)</li>
+  <li>books.delete(object, ...)</li>
+  <li>books.destroy(object, ...)</li>
+  <li>books=(objects)</li>
+  <li>books_singular_ids</li>
+  <li>books_singular_ids=(ids)</li>
+  <li>books.clear</li>
+  <li>books.empty?</li>
+  <li>books.size</li>
+  <li>books.find(...)</li>
+  <li>books.where(...)</li>
+  <li>books.exists?(...)</li>
+  <li>books.build(attributes = {}, ...)</li>
+  <li>books.create(attributes = {})</li>
+  <li>books.create!(attributes = {})</li>
+</ul>
+
+
+<p>That’s a lot of new functionality from Active Record (though actually, having touched briefly on Rails today, relatively, it’s not that much). If you’re curious what they all do, check out <a href = http://edgeguides.rubyonrails.org/association_basics.html>this page</a>.</p>
+
+<p>So let’s say we want to create a new author and a book, and make sure that they’re properly related to each other. We can write:</p>
+
+<pre><code>
+pkd = Author.new(name: ‘Phillip K. Dick’)
+android = pkd.books.build(title: ‘Do Androids Dream of Electric Sheep’)
+pkd.save
+=> true
+
+android.persisted?
+=> true
+</code></pre>
+
+
+<p>In three lines we have created an author memory using .new, created a book in memory using .build, and added them to the database using .save. Behind the scenes, we assigned the book to belong to the author via an author_id, made the author own the book via a book_id, and saved the book to the database. That’s a ton of work being done by Active Record. I want to investigate the parent-children, one-to-many, has_many / belongs_to relationship.</p>
+
+<p>When we saved the Author pkd, we also saved the book we created. This is pretty handy. We only have to save one object, and automatically it and all of its children are saved to the database. If we had added more books to pkd, we would have saved them as well.</p>
+
+<p>But what if we save the book, and not the author?</p>
+
+<pre><code>
+pkd = Author.new(name: “Phillip K Dick”)
+android = pkd.books.build(title: ‘Do Androids Dream of Electric Sheep’)
+stigmata = pd.books.build(title: ‘The Three Stigmata of Palmer Eldritch’)
+android.save
+
+pkd.persisted?
+=> true
+
+stigmata.persisted?
+=> true
+</code></pre>
+
+
+<p>Once again, all three of the objects we created are saved in memory and in the databse. Beautiful.</p>
+
+<p>So we can always save one object in a parent-child relationship and all of the children and the parent will be saved right? Unfortunately, no - not right. Let’s look at the inverse of the above: when the book creates the author — when the child creates the parent.</p>
+
+<pre><code>
+android = Book.new(title: ‘Do Androids Dream of Electric Sheep’)
+pkd = android.build_author(name: “Phillip K Dick”)
+android.save
+
+pkd.persisted?
+=> false
+</code></pre>
+
+
+<p>Here we created a book in line 1, used the book to create an author and establish their relationship in line 2, and saved the book in line 3. Yet if we looked at the objects, only the book would be saved in the database, while the author would remain in memory. It’s an odd edge case, but one to look out for.</p>
+
+<p>So when you’re saving your parents and children to the database, think of the database like an airplane. If there’s ever an emergency, you should put oxygen on yourself first before saving your children. ActiveRecord is the same: save the parents first, so they can save the children. Won’t you please think of the children?</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Ezra Smyser</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-06-25T20:35:25-04:00" pubdate data-updated="true"></time>
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://esmyser.github.io/blog/2015/06/25/wont-somebody-please-think-of-the-children/" data-via="esmyser" data-counturl="http://esmyser.github.io/blog/2015/06/25/wont-somebody-please-think-of-the-children/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/06/14/enumerators-human-centeric-code/" title="Previous Post: Expressive Code">&laquo; Expressive Code</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <form action="https://www.google.com/search" method="get">
+      <fieldset role="search">
+        <input type="hidden" name="q" value="site:esmyser.github.io" />
+        <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+      </fieldset>
+    </form>
+  
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/06/25/wont-somebody-please-think-of-the-children/">Won't Somebody Please Think of the Children?!</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/06/14/enumerators-human-centeric-code/">Expressive Code</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/06/02/first-post/">First Post</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/esmyser">@esmyser</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'esmyser',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Ezra Smyser -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="/javascripts/aharris.js"></script>
+
+</body>
+</html>
